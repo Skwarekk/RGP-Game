@@ -1,5 +1,7 @@
 package main;
 
+import entity.Player;
+
 import javax.swing.JPanel;
 import java.awt.*;
 
@@ -9,7 +11,7 @@ public class GamePanel extends JPanel implements Runnable{
     private final int ORIGINAL_TILE_SIZE = 16; // 16 x 16 tile
     private final int SCALE = 3;
 
-    private final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE;
+    public final int TILE_SIZE = ORIGINAL_TILE_SIZE * SCALE;
 
     private final int MAX_SCREEN_COLUMN = 16;
     private final int MAX_SCREEN_ROW = 12;
@@ -21,8 +23,9 @@ public class GamePanel extends JPanel implements Runnable{
     private final int FPS = 60;
     private final long SECOND = 1000000000;
 
-    private final KeyHandler KEY_HANDLER = new KeyHandler();
+    private KeyHandler keyHandler = new KeyHandler();
     private Thread gameThread;
+    private Player player = new Player(this, keyHandler);
 
     // Set player's default position
     private int playerX = 100;
@@ -34,7 +37,7 @@ public class GamePanel extends JPanel implements Runnable{
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
-        this.addKeyListener(KEY_HANDLER);
+        this.addKeyListener(keyHandler);
         this.setFocusable(true);
     }
 
@@ -81,19 +84,7 @@ public class GamePanel extends JPanel implements Runnable{
 
     public void update(){
 
-        if(KEY_HANDLER.upPressed){
-
-            playerY -= playerSpeed;
-        } else if(KEY_HANDLER.downPressed){
-
-            playerY += playerSpeed;
-        } else if(KEY_HANDLER.leftPressed){
-
-            playerX -= playerSpeed;
-        } else if(KEY_HANDLER.rightPressed){
-
-            playerX += playerSpeed;
-        }
+        player.update();
     }
 
     public void paintComponent(Graphics graphics){
@@ -102,8 +93,7 @@ public class GamePanel extends JPanel implements Runnable{
 
         Graphics2D graphics2D = (Graphics2D) graphics;
 
-        graphics2D.setColor(Color.white);
-        graphics2D.fillRect(playerX, playerY, TILE_SIZE, TILE_SIZE);
+        player.draw(graphics2D);
 
         graphics2D.dispose();
     }
