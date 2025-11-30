@@ -17,13 +17,25 @@ public class GamePanel extends JPanel implements Runnable{
     private final int SCREEN_WIDTH = TILE_SIZE * MAX_SCREEN_COLUMN; // 768 px
     private final int SCREEN_HEIGHT = TILE_SIZE * MAX_SCREEN_ROW; // 576 px
 
+    // FPS
+    private final int FPS = 60;
+    private final long SECOND = 1000000000;
+
+    private final KeyHandler KEY_HANDLER = new KeyHandler();
     private Thread gameThread;
+
+    // Set player's default position
+    private int playerX = 100;
+    private int playerY = 100;
+    private int playerSpeed = 4;
 
     public GamePanel(){
 
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
+        this.addKeyListener(KEY_HANDLER);
+        this.setFocusable(true);
     }
 
     public void startGameThread(){
@@ -35,20 +47,64 @@ public class GamePanel extends JPanel implements Runnable{
     @Override
     public void run() {
 
-        while(gameThread != null){
+        double drawInterval = (double) SECOND / FPS;
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
 
-            // 1. UPDATE: update game logic such as character position
-            update();
+        long timer = 0;
+        int drawCounter = 0;
 
-            // 2. DRAW: draw the screen with the updated game logic
-            repaint();
+        while (gameThread != null){
+
+            currentTime = System.nanoTime();
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += currentTime - lastTime;
+            lastTime = currentTime;
+
+            if(delta >= 1){
+
+                update();
+                repaint();
+                delta--;
+                drawCounter++;
+            }
+
+            if(timer >= SECOND){
+
+                System.out.println("FPS: " + drawCounter);
+                drawCounter = 0;
+                timer = 0;
+            }
         }
     }
 
-    public void update(){}
+    public void update(){
+
+        if(KEY_HANDLER.upPressed){
+
+            playerY -= playerSpeed;
+        } else if(KEY_HANDLER.downPressed){
+
+            playerY += playerSpeed;
+        } else if(KEY_HANDLER.leftPressed){
+
+            playerX -= playerSpeed;
+        } else if(KEY_HANDLER.rightPressed){
+
+            playerX += playerSpeed;
+        }
+    }
 
     public void paintComponent(Graphics graphics){
 
         super.paintComponent(graphics);
+
+        Graphics2D graphics2D = (Graphics2D) graphics;
+
+        graphics2D.setColor(Color.white);
+        graphics2D.fillRect(playerX, playerY, TILE_SIZE, TILE_SIZE);
+
+        graphics2D.dispose();
     }
 }
