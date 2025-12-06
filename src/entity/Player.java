@@ -3,8 +3,10 @@ package entity;
 import main.GamePanel;
 import main.KeyHandler;
 
+import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
-import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
 public class Player extends Entity{
 
@@ -17,6 +19,7 @@ public class Player extends Entity{
         this.keyHandler = keyHandler;
 
         setDefaultValues();
+        getPlayerImage();
     }
 
     public void setDefaultValues(){
@@ -24,28 +27,89 @@ public class Player extends Entity{
         x = 100;
         y = 100;
         speed = 4;
+        direction = "down";
+    }
+
+    public void getPlayerImage(){
+
+        try{
+
+            up1 = ImageIO.read(getClass().getResourceAsStream("/player/player_up_1.png"));
+            up2 = ImageIO.read(getClass().getResourceAsStream("/player/player_up_2.png"));
+            down1 = ImageIO.read(getClass().getResourceAsStream("/player/player_down_1.png"));
+            down2 = ImageIO.read(getClass().getResourceAsStream("/player/player_down_2.png"));
+            left1 = ImageIO.read(getClass().getResourceAsStream("/player/player_left_1.png"));
+            left2 = ImageIO.read(getClass().getResourceAsStream("/player/player_left_2.png"));
+            right1 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_1.png"));
+            right2 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_2.png"));
+        }catch (IOException error){
+
+            error.printStackTrace();
+        }
     }
 
     public void update(){
 
-        if(keyHandler.upPressed){
+        if(keyHandler.upPressed || keyHandler.downPressed || keyHandler.leftPressed || keyHandler.rightPressed){
+            if(keyHandler.upPressed){
 
-            y -= speed;
-        } else if(keyHandler.downPressed){
+                direction = "up";
+                y -= speed;
+            } else if(keyHandler.downPressed){
 
-            y += speed;
-        } else if(keyHandler.leftPressed){
+                direction = "down";
+                y += speed;
+            } else if(keyHandler.leftPressed){
 
-            x -= speed;
-        } else if(keyHandler.rightPressed){
+                direction = "left";
+                x -= speed;
+            } else if(keyHandler.rightPressed){
 
-            x += speed;
+                direction = "right";
+                x += speed;
+            }
+
+            spriteCounter++;
+            if(spriteCounter > animationInterval){
+
+                spriteNumber = switch (spriteNumber){
+
+                    case 1 -> 2;
+                    case 2 -> 1;
+                    default -> 0;
+                };
+
+                spriteCounter = 0;
+            }
         }
     }
 
     public void draw(Graphics2D graphics2D){
 
-        graphics2D.setColor(Color.white);
-        graphics2D.fillRect(x, y, gamePanel.TILE_SIZE, gamePanel.TILE_SIZE);
+        BufferedImage image = switch (direction) {
+            case "up" -> switch (spriteNumber) {
+                case 1 -> up1;
+                case 2 -> up2;
+                default -> null;
+            };
+            case "down" -> switch (spriteNumber) {
+                case 1 -> down1;
+                case 2 -> down2;
+                default -> null;
+            };
+            case "left" -> switch (spriteNumber) {
+                case 1 -> left1;
+                case 2 -> left2;
+                default -> null;
+            };
+            case "right" -> switch (spriteNumber) {
+                case 1 -> right1;
+                case 2 -> right2;
+                default -> null;
+            };
+            default -> null;
+        };
+
+        graphics2D.drawImage(image, x, y, gamePanel.TILE_SIZE, gamePanel.TILE_SIZE, null);
     }
 }
