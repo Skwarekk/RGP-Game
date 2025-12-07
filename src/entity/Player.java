@@ -10,8 +10,8 @@ import java.io.IOException;
 
 public class Player extends Entity{
 
-    GamePanel gamePanel;
-    KeyHandler keyHandler;
+    private GamePanel gamePanel;
+    private KeyHandler keyHandler;
 
     public Player(GamePanel gamePanel, KeyHandler keyHandler){
 
@@ -30,7 +30,7 @@ public class Player extends Entity{
         direction = "down";
     }
 
-    public void getPlayerImage(){
+    private void getPlayerImage(){
 
         try{
 
@@ -42,9 +42,9 @@ public class Player extends Entity{
             left2 = ImageIO.read(getClass().getResourceAsStream("/player/player_left_2.png"));
             right1 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_1.png"));
             right2 = ImageIO.read(getClass().getResourceAsStream("/player/player_right_2.png"));
-        }catch (IOException error){
+        }catch (IOException exception){
 
-            error.printStackTrace();
+            exception.printStackTrace();
         }
     }
 
@@ -110,6 +110,6 @@ public class Player extends Entity{
             default -> null;
         };
 
-        graphics2D.drawImage(image, x, y, gamePanel.TILE_SIZE, gamePanel.TILE_SIZE, null);
+        graphics2D.drawImage(image, x, y, gamePanel.getTileSize(), gamePanel.getTileSize(), null);
     }
 }
