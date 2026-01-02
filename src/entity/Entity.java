@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class Entity {
 
-    protected int x, y;
+    protected int worldX, worldY;
     protected int speed;
 
     protected String direction;
@@ -15,4 +15,8 @@ public class Entity {
     protected int spriteNumber = 1;
 
     protected int animationInterval = 12;
+
+    public int getWorldX() { return worldX; }
+
+    public int getWorldY() { return worldY; }
 }
